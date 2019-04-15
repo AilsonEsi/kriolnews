@@ -38,15 +38,14 @@
     -->
     <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
     
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
     <!-- bootstrap style css -->
     <link rel="stylesheet" type="text/css" href="css/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
 
-    <!-- ./bootstrap style css -->
-    <link rel="stylesheet" href="css/fontawesome/all.css">
-
     <title>KriolNews | Encontre o resumo das noticias mais recentes.</title>
+
 </head>
 
 <body>
@@ -58,13 +57,13 @@
                         <button class="btn btn-dark" onclick="openNav()">Menu</button>
                     </div>
                     <div class="col-9">
-                        <form class="d-flex justify-content-center mb-2">
+                        <div class="d-flex justify-content-center mb-2">
                             <!-- Default input -->
-                            <input type="search" placeholder="Noticias" aria-label="Search" class="form-control">
-                            <button class="btn btn-primary btn-sm my-0 p" type="submit">
+                            <input id="myInput" type="search" placeholder="Noticias" aria-label="Search" class="form-control">
+                            <button id="search" class="btn btn-primary btn-sm my-0 p">
                                 <span class="">Buscar</span>
                             </button>
-                        </form>
+                        </div>
                     </div>
                 </div>
 
@@ -98,48 +97,143 @@
                 <!-- Sidebar -->
             </header>
             
-            <div class="row my-4">
-                <div class="col-4"><img src="http://placehold.it/100x100" alt="img 1"></div>
-                <div class="col-8">
-                    <h4>Title</h4>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!
-                </div>
-            </div>
-            <div class="row my-4">
-                <div class="col-4"><img src="http://placehold.it/100x100" alt="img 1"></div>
-                <div class="col-8">
-                    <h4>Title</h4>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!
-                </div>
-            </div>
-            <div class="row my-4">
-                <div class="col-4"><img src="http://placehold.it/100x100" alt="img 1"></div>
-                <div class="col-8">
-                    <h4>Title</h4>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!
-                </div>
-            </div>
-            <div class="row my-4">
-                <div class="col-4"><img src="http://placehold.it/100x100" alt="img 1"></div>
-                <div class="col-8">
-                    <h4>Title</h4>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!
-                </div>
-            </div>
-            <div class="row my-4">
-                <div class="col-4"><img src="http://placehold.it/100x100" alt="img 1"></div>
-                <div class="col-8">
-                    <h4>Title</h4>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!
-                </div>
+            <div id="newsContainer">
+                <!-- Content -->
             </div>
         </div>
     </div>
+
+    <script type="text/javascript">
     
+    //function loadNews(){
+        var xml = new XMLHttpRequest();
+        var newsJson =null;
+        var img;
+        xml.onreadystatechange = function() {
+            if(this.status == 200){
+                newsJson = JSON.parse(this.response);
+
+                console.log(newsJson.length);
+                showNews(newsJson)
+                var newsJson = null;
+            }
+        }
+
+        //xml.open("GET", "http://kriolnews.herokuapp.com/kriolnews/v1/news");
+        xml.open("GET", "http://localhost:8080/kriolnews/v1/news");
+        xml.setRequestHeader("Content-Type", "application/json");
+        xml.send();
+    //}
+
+    function showNews(newsJson){
+        
+        //var newsContent = document.getElementById("newsContent");
+        //a
+        for(var i=0; i<newsJson.length; i++){
+
+            var div0 = document.createElement("div");
+            var div0Class = document.createAttribute("class");
+            
+            div0Class.value="newscontent";
+
+            div0.setAttributeNode(div0Class);
+
+            var a = document.createElement("a");
+            var attrClass = document.createAttribute("class");
+            var href = document.createAttribute("href");
+            var attrStyle = document.createAttribute("style");
+
+            attrClass.value="row my-4 text-dark";
+            href.value=newsJson[0].link;
+            attrStyle.value="text-decoration: none; text-align: justify";
+
+            a.setAttributeNode(attrClass);
+            a.setAttributeNode(href);
+            a.setAttributeNode(attrStyle);
+
+            div0.appendChild(a);
+
+            //div1
+            var div1 = document.createElement("div");
+            var div1Class = document.createAttribute("class");
+
+            div1Class.value="col-4";
+            div1.setAttributeNode(div1Class);
+
+            a.appendChild(div1);
+            
+            //img
+            var img = document.createElement("img");
+            var imgClass = document.createAttribute("class");
+            var imgStyle = document.createAttribute("style");
+            var imgSrc = document.createAttribute("src");
+
+            imgClass.value="img img-thumbnail img-fluid";
+            imgStyle.value="width: 100%; height: 100%;";
+            imgSrc.value=newsJson[i].image;
+
+            img.setAttributeNode(imgClass);
+            img.setAttributeNode(imgStyle);
+            img.setAttributeNode(imgSrc);
+
+            div1.appendChild(img);
+
+            //div2
+            var div2 = document.createElement("div");
+            var div2Class = document.createAttribute("class");
+
+            div2Class.value="col-8";
+
+            div2.setAttributeNode(div2Class);
+
+            a.appendChild(div2);
+
+            //h5
+            var h5 = document.createElement("h5");
+            var h5Class = document.createAttribute("class");
+            var h5Style = document.createAttribute("style");
+            var h5TextNode = document.createTextNode(newsJson[i].title);
+
+            h5Class.value="font-weight-bold";
+            h5Style.value="font-size: 13pt;";
+
+            h5.setAttributeNode(h5Class);
+            h5.setAttributeNode(h5Style);
+
+            h5.appendChild(h5TextNode);
+
+            div2.appendChild(h5);
+
+            //div3
+            var div3 = document.createElement("div");
+            var div3TextNode = document.createTextNode(newsJson[i].content);
+            var div3Style = document.createAttribute("style");
+
+            div3Style.value="-webkit-line-clamp: 2!important; -webkit-box-orient: vertical!important;display: -webkit-inline-box!important;text-overflow: ellipsis!important;overflow: hidden!important;font-weight: 400;word-wrap: break-word;"
+
+            div3.setAttributeNode(div3Style);
+            div3.appendChild(div3TextNode);
+
+            div2.appendChild(div3);
+                    
+            $('#newsContainer').append(div0);
+        }
+    }
+    
+    $(document).ready(function(){
+        $("#search").on("click", function() {
+            var value = $("#myInput").val().toLowerCase();
+            $("#newsContainer div.newscontent").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+    //window.document.onload=loadNews();
+
+    </script>
     
     <!-- bootstrap script -->
-    <script type="text/javascript" src="js/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap/js/bootstrap.bundle.js"></script>
 
     <!-- ./bootstrap script-->
 
@@ -150,7 +244,7 @@
     <script type="text/javascript" src="cordova.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
     <script type="text/javascript">
-        app.initialize();
+        //app.initialize();
     </script>
 </body>
 
