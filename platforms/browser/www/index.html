@@ -140,14 +140,17 @@
 
             var a = document.createElement("a");
             var attrClass = document.createAttribute("class");
+            var target = document.createAttribute("target");
             var href = document.createAttribute("href");
             var attrStyle = document.createAttribute("style");
 
             attrClass.value="row my-4 text-dark";
+            target.value="blank";
             href.value=newsJson[0].link;
             attrStyle.value="text-decoration: none; text-align: justify";
 
             a.setAttributeNode(attrClass);
+            a.setAttributeNode(target);
             a.setAttributeNode(href);
             a.setAttributeNode(attrStyle);
 
