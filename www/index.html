@@ -46,6 +46,16 @@
 
     <title>KriolNews | Encontre o resumo das noticias mais recentes.</title>
 
+    <script type="text/javascript">
+        if(!navigator.onLine){
+            alert("Por favor, certifique a sua ligação a internet...");
+        }
+
+       function reload(){
+           location.reload();
+       }
+    </script>
+    
 </head>
 
 <body>
@@ -69,7 +79,7 @@
 
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
+                        <li class="breadcrumb-item"><a onclick="reload()" href="/">Inicio</a></li>
                         <li class="breadcrumb-item"><a href="#">Noticias</a></li>
                     </ol>
                 </nav>
@@ -82,11 +92,12 @@
                             Kriol<span class="btn-danger">News</span>
                         </div>
                         <div class="border-bottom">
-                            <a href="#">Todas noticas</a>
-                            <a href="#">Saude</a>
-                            <a href="#">Politica</a>
-                            <a href="#">Desporto</a>
-                            <a href="#">Economia</a>
+                            <a href="#" name="todas" onclick="reload()">Todas noticias</a>
+                            <a href="#" name="política" onclick="selectCategory(this)">Politica</a>
+                            <a href="#" name="economia" onclick="selectCategory(this)">Economia</a>
+                            <a href="#" name="sociedade" onclick="selectCategory(this)">Sociedade</a>
+                            <a href="#" name="cultura" onclick="selectCategory(this)">Cultura</a>
+                            <a href="#" name="ambiente" onclick="selectCategory(this)">Ambiente</a>
                         </div>
                         <div>
                             <a href="#">Entrar</a>
@@ -105,13 +116,13 @@
 
     <script type="text/javascript">
     
-    //function loadNews(){
+    function loadNews(){
         var xml = new XMLHttpRequest();
         var newsJson =null;
         var img;
         xml.onreadystatechange = function() {
             if(this.status == 200){
-                newsJson = JSON.parse(this.response);
+                newsJson=JSON.parse(this.response);
 
                 console.log(newsJson.length);
                 showNews(newsJson)
@@ -120,24 +131,30 @@
         }
 
         //xml.open("GET", "http://kriolnews.herokuapp.com/kriolnews/v1/news");
-        xml.open("GET", "http://localhost:8080/kriolnews/v1/news");
+        xml.open("GET", "https://kriolnews.herokuapp.com/kriolnews/v1/news");
         xml.setRequestHeader("Content-Type", "application/json");
         xml.send();
-    //}
+    }
 
     function showNews(newsJson){
         
         //var newsContent = document.getElementById("newsContent");
-        //a
-        for(var i=0; i<newsJson.length; i++){
+       for(var i=0; i<newsJson.length; i++){
 
+            //div0
             var div0 = document.createElement("div");
             var div0Class = document.createAttribute("class");
+            var inputHidden = document.createElement("input");
             
+            inputHidden.type="hidden";
+            inputHidden.setAttribute("class", "category");
+            inputHidden.value=newsJson[i].category;
             div0Class.value="newscontent";
 
             div0.setAttributeNode(div0Class);
+            div0.appendChild(inputHidden);
 
+            //a
             var a = document.createElement("a");
             var attrClass = document.createAttribute("class");
             var target = document.createAttribute("target");
@@ -145,14 +162,15 @@
             var attrStyle = document.createAttribute("style");
 
             attrClass.value="row my-4 text-dark";
-            target.value="blank";
-            href.value=newsJson[0].link;
-            attrStyle.value="text-decoration: none; text-align: justify";
+            target.value="_blank";
+            href.value=newsJson[i].link;
+            attrStyle.value="text-decoration: none;";
 
             a.setAttributeNode(attrClass);
             a.setAttributeNode(target);
             a.setAttributeNode(href);
             a.setAttributeNode(attrStyle);
+            a.setAttribute('id','link');
 
             div0.appendChild(a);
 
@@ -171,7 +189,7 @@
             var imgStyle = document.createAttribute("style");
             var imgSrc = document.createAttribute("src");
 
-            imgClass.value="img img-thumbnail img-fluid";
+            imgClass.value="img-thumbnail";
             imgStyle.value="width: 100%; height: 100%;";
             imgSrc.value=newsJson[i].image;
 
@@ -224,6 +242,9 @@
     }
     
     $(document).ready(function(){
+        
+        loadNews();
+
         $("#search").on("click", function() {
             var value = $("#myInput").val().toLowerCase();
             $("#newsContainer div.newscontent").filter(function() {
@@ -232,8 +253,14 @@
         });
     });
 
-    //window.document.onload=loadNews();
+    function selectCategory(cat){
+        var value = cat.name.toLowerCase;
+        $("#newsContainer div.newscontent").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
 
+    //window.document.onload=loadNews();
     </script>
     
     <!-- bootstrap script -->
