@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<!--
+    Copyright (c) 2012-2016 Adobe Systems Incorporated. All rights reserved.
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <!-- This is a wide open CSP declaration. To lock this down for production, see below. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' gap:; style-src 'self' 'unsafe-inline'; media-src *" />
+    <!-- Good default declaration:
+    * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+    * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+    * Disables use of eval() and inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+        * Enable inline JS: add 'unsafe-inline' to default-src
+        * Enable eval(): add 'unsafe-eval' to default-src
+    * Create your own at http://cspisawesome.com
+    -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: 'unsafe-inline' https://ssl.gstatic.com; style-src 'self' 'unsafe-inline'; media-src *" /> -->
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- bootstrap style css -->
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+
+    <title>KriolNews | Encontre o resumo das noticias mais recentes.</title>
+
+    <script type="text/javascript">
+        if(!navigator.onLine){
+            alert("Por favor, certifique a sua ligação a internet...");
+        }
+
+       function reload(){
+           location.reload();
+       }
+    </script>
+    
+</head>
+
+<body>
+    <div id="main" class="app">
+        <div class="container my-4">
+            <header>
+                <div class="row">
+                    <div class="col-3">
+                        <button class="btn btn-dark" onclick="openNav()">Menu</button>
+                    </div>
+                    <div class="col-9">
+                        <div class="d-flex justify-content-center mb-2">
+                            <!-- Default input -->
+                            <input id="myInput" type="search" placeholder="Noticias" aria-label="Search" class="form-control">
+                            <button id="search" class="btn btn-primary btn-sm my-0 p">
+                                <span class="">Buscar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a onclick="reload()" href="/">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="#">Noticias</a></li>
+                    </ol>
+                </nav>
+
+                <!-- Sidebar -->
+                <div id="mySidenav" class="sidenav">
+                    <div class="contianer">
+                        <a style="font-size: 3em;" href="javascript:void(0)" class="closebtn text-white text-right my-0" onclick="closeNav()">&times;</a>
+                        <div style="font-size: 30pt;" class="text-center text-white">
+                            Kriol<span class="btn-danger">News</span>
+                        </div>
+                        <div class="border-bottom">
+                            <a href="#" name="todas" onclick="reload()">Todas noticias</a>
+                            <a href="#" name="política" onclick="selectCategory(this)">Politica</a>
+                            <a href="#" name="economia" onclick="selectCategory(this)">Economia</a>
+                            <a href="#" name="sociedade" onclick="selectCategory(this)">Sociedade</a>
+                            <a href="#" name="cultura" onclick="selectCategory(this)">Cultura</a>
+                            <a href="#" name="ambiente" onclick="selectCategory(this)">Ambiente</a>
+                        </div>
+                        <div>
+                            <a href="#">Entrar</a>
+                            <a href="#">Registrar</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sidebar -->
+            </header>
+            
+            <div id="newsContainer">
+                <!-- Content -->
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    
+    function loadNews(){
+        var xml = new XMLHttpRequest();
+        var newsJson =null;
+        var img;
+        xml.onreadystatechange = function() {
+            if(this.status == 200){
+                newsJson=JSON.parse(this.response);
+
+                console.log(newsJson.length);
+                showNews(newsJson)
+                var newsJson = null;
+            }
+        }
+
+        //xml.open("GET", "http://kriolnews.herokuapp.com/kriolnews/v1/news");
+        xml.open("GET", "https://kriolnews.herokuapp.com/kriolnews/v1/news");
+        xml.setRequestHeader("Content-Type", "application/json");
+        xml.send();
+    }
+
+    function showNews(newsJson){
+        
+        //var newsContent = document.getElementById("newsContent");
+       for(var i=0; i<newsJson.length; i++){
+
+            //div0
+            var div0 = document.createElement("div");
+            var div0Class = document.createAttribute("class");
+            var inputHidden = document.createElement("input");
+            
+            inputHidden.type="hidden";
+            inputHidden.setAttribute("class", "category");
+            inputHidden.value=newsJson[i].category;
+            div0Class.value="newscontent";
+
+            div0.setAttributeNode(div0Class);
+            div0.appendChild(inputHidden);
+
+            //a
+            var a = document.createElement("a");
+            var attrClass = document.createAttribute("class");
+            var target = document.createAttribute("target");
+            var href = document.createAttribute("href");
+            var attrStyle = document.createAttribute("style");
+
+            attrClass.value="row my-4 text-dark";
+            target.value="_blank";
+            href.value=newsJson[i].link;
+            attrStyle.value="text-decoration: none;";
+
+            a.setAttributeNode(attrClass);
+            a.setAttributeNode(target);
+            a.setAttributeNode(href);
+            a.setAttributeNode(attrStyle);
+            a.setAttribute('id','link');
+
+            div0.appendChild(a);
+
+            //div1
+            var div1 = document.createElement("div");
+            var div1Class = document.createAttribute("class");
+
+            div1Class.value="col-4";
+            div1.setAttributeNode(div1Class);
+
+            a.appendChild(div1);
+            
+            //img
+            var img = document.createElement("img");
+            var imgClass = document.createAttribute("class");
+            var imgStyle = document.createAttribute("style");
+            var imgSrc = document.createAttribute("src");
+
+            imgClass.value="img-thumbnail";
+            imgStyle.value="width: 100%; height: 100%;";
+            imgSrc.value=newsJson[i].image;
+
+            img.setAttributeNode(imgClass);
+            img.setAttributeNode(imgStyle);
+            img.setAttributeNode(imgSrc);
+
+            div1.appendChild(img);
+
+            //div2
+            var div2 = document.createElement("div");
+            var div2Class = document.createAttribute("class");
+
+            div2Class.value="col-8";
+
+            div2.setAttributeNode(div2Class);
+
+            a.appendChild(div2);
+
+            //h5
+            var h5 = document.createElement("h5");
+            var h5Class = document.createAttribute("class");
+            var h5Style = document.createAttribute("style");
+            var h5TextNode = document.createTextNode(newsJson[i].title);
+
+            h5Class.value="font-weight-bold";
+            h5Style.value="font-size: 13pt;";
+
+            h5.setAttributeNode(h5Class);
+            h5.setAttributeNode(h5Style);
+
+            h5.appendChild(h5TextNode);
+
+            div2.appendChild(h5);
+
+            //div3
+            var div3 = document.createElement("div");
+            var div3TextNode = document.createTextNode(newsJson[i].content);
+            var div3Style = document.createAttribute("style");
+
+            div3Style.value="-webkit-line-clamp: 2!important; -webkit-box-orient: vertical!important;display: -webkit-inline-box!important;text-overflow: ellipsis!important;overflow: hidden!important;font-weight: 400;word-wrap: break-word;"
+
+            div3.setAttributeNode(div3Style);
+            div3.appendChild(div3TextNode);
+
+            div2.appendChild(div3);
+                    
+            $('#newsContainer').append(div0);
+        }
+    }
+    
+    $(document).ready(function(){
+        
+        loadNews();
+
+        $("#search").on("click", function() {
+            var value = $("#myInput").val().toLowerCase();
+            $("#newsContainer div.newscontent").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+    function selectCategory(cat){
+        var value = cat.name.toLowerCase;
+        $("#newsContainer div.newscontent").filter(function() {
+        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    }
+
+    //window.document.onload=loadNews();
+    </script>
+    
+    <!-- bootstrap script -->
+
+    <!-- ./bootstrap script-->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript">
+        //app.initialize();
+    </script>
+</body>
+
+</html>
