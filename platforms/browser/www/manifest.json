@@ -1,11 +1,11 @@
 {
   "background_color": "#FFF",
   "display": "standalone",
-  "name": "helloworld",
-  "short_name": "helloworld",
+  "name": "KriolNews",
+  "short_name": "KriolNews",
   "version": "com.phonegap.helloworld",
-  "description": "Hello World sample application that responds to the deviceready event.",
-  "author": "PhoneGap Team",
+  "description": "KriolNews | Encontre o resumo das noticias mais recentes.",
+  "author": "SmallKode Team",
   "icons": [],
   "start_url": "index.html"
 }
